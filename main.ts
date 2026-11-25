@@ -1,5 +1,4 @@
-// Fresh-burst scalper + dip buyer for the pump.fun paper replay
-// (agent-fun/replay/v2).
+// Dip buyer for the pump.fun paper replay (agent-fun/replay/v2).
 //
 // The harness speaks a tiny line protocol: one `hello` first (capital, caps,
 // latency in slots, fees, seed), then one `batch` per slot carrying that
@@ -9,7 +8,7 @@
 // stream: no clock, no environment, no randomness, so two runs of the same
 // window produce byte-identical action logs.
 //
-// Two entries, one exit philosophy each:
+// One entry, one exit philosophy, plus a guardrail probe:
 //
 // 1. Dip entries (the profit engine). A young curve that just dumped >= 5%
 //    inside 10 slots while buyers are still stepping in (>= 3 buys, net
@@ -20,14 +19,12 @@
 //    a 900-slot time limit. Tight exits were measured to kill this edge:
 //    they cut the runners that pay for all the small losers.
 //
-// 2. Burst entries (coin-count filler plus lottery tickets). A young curve
-//    with a live buying burst (>= 6 buys, >= 5 distinct buyers, >= 0.5 SOL
-//    net inflow, price up >= 5% over 10 slots, near its window high) gets a
-//    small 0.02 SOL stake and tight exits (-8% stop, +25% take-profit,
-//    10% trailing stop armed at +4%, 250-slot limit). On their own these
-//    lose a little per trade, but they keep the bot above the guardrail bar
-//    of 20 distinct coins with a >= 0.01 SOL round trip each, and they
-//    occasionally catch a runner.
+// 2. Burst entries (disabled: BURST_STAKE_SOL = 0). A young curve with a
+//    live buying burst used to get a small 0.02 SOL stake, but local grading
+//    measured those trades to lose money net of fees at small size (the
+//    fixed per-order tx fee dominates a 0.01-0.02 SOL stake), so the burst
+//    signal is kept in the code but buys nothing. Coin count comes from dip
+//    entries plus the pace probe below instead.
 //
 // A pace probe (a 0.02 SOL buy sold on the next batch) fires only if the
 // distinct-coin count is still lagging late in the window.
@@ -56,16 +53,16 @@ const TAPE_KEEP_SLOTS = 1000; // trades older than this are pruned
 const DIP_MIN_AGE = 8; // slots since CreateEvent before a buy is allowed
 const DIP_MAX_AGE = 900; // ... and after this the dip is stale
 const DIP_MIN_BUYS = 3; // buy trades inside the window
-const DIP_MIN_NET_SOL = 0; // net SOL inflow (buys minus sells) in window
+const DIP_MIN_NET_SOL = 0.1; // net SOL inflow (buys minus sells) in window
 const DIP_DROP = 0.05; // price fall over the window, as a fraction
 const DIP_MIN_RQ_SOL = 0.3; // real SOL reserves at entry, lower bound
 const DIP_MAX_RQ_SOL = 25; // ... upper bound
-const DIP_STAKE_SOL = 0.08; // fixed buy size per dip coin
-const DIP_STOP = 0.12; // sell when close value < cost * (1 - DIP_STOP)
+const DIP_STAKE_SOL = 0.25; // fixed buy size per dip coin
+const DIP_STOP = 0.15; // sell when close value < cost * (1 - DIP_STOP)
 const DIP_TRAIL_ARM = 0.1; // trailing stop arms once value >= cost * (1 + arm)
-const DIP_TRAIL = 0.3; // ... then sells when value < peak * (1 - DIP_TRAIL)
-const DIP_TP = 2.0; // hard sell at value >= cost * (1 + DIP_TP)
-const DIP_MAX_HOLD = 900; // time-limit exit, in slots
+const DIP_TRAIL = 0.4; // ... then sells when value < peak * (1 - DIP_TRAIL)
+const DIP_TP = 3.0; // hard sell at value >= cost * (1 + DIP_TP)
+const DIP_MAX_HOLD = 1200; // time-limit exit, in slots
 
 // ---- burst entries ----
 const BURST_MIN_AGE = 8;
@@ -77,7 +74,7 @@ const BURST_MIN_UP = 0.05; // price rise over the window, as a fraction
 const BURST_NEAR_HIGH = 0.97; // last price vs the window high
 const BURST_MIN_RQ_SOL = 0.3;
 const BURST_MAX_RQ_SOL = 25;
-const BURST_STAKE_SOL = 0.02;
+const BURST_STAKE_SOL = 0.0; // burst entries disabled: measured to lose money net of fees at small size
 const BURST_STOP = 0.08;
 const BURST_TRAIL_ARM = 0.04;
 const BURST_TRAIL = 0.1;

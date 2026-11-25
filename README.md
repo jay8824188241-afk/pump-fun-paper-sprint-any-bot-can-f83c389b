@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b/jay8824188241-afk/pump-fun-paper-sprint-any-bot-can-f83c389b/rank.svg)](https://make.fun/bounty/u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b)
 [![reward](https://make.fun/badge/u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b/jay8824188241-afk/pump-fun-paper-sprint-any-bot-can-f83c389b/reward.svg)](https://make.fun/bounty/u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b?utm_source=github&utm_medium=readme&utm_campaign=u-boothlord-pump-fun-paper-sprint-any-bot-can-f83c389b)
 
-Fresh-burst scalper for pump.fun paper trading: buys young bonding curves on early buy-pressure bursts and exits on a trailing stop, stop-loss or time limit. Node 22, zero dependencies, fully deterministic.
+Dip buyer for pump.fun paper trading: buys young bonding curves after a sharp dip while buyers step in, exits loose to catch fat-tail runners. Node 22, zero dependencies, fully deterministic.
 
 ## Run it
 
